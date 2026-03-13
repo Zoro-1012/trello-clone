@@ -1,6 +1,6 @@
 async function main() {
-  const { writeBoardState } = await import("../lib/board-repository.js");
-  const { initialState } = await import("../lib/board-state.js");
+  const { writeBoardState } = await import("../backend/board-repository.js");
+  const { initialState } = await import("../shared/board-state.js");
   await writeBoardState(initialState);
 }
 

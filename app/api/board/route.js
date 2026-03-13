@@ -1,4 +1,4 @@
-import { createBoardRecord, readBoardState, writeBoardState } from "../../../lib/board-repository";
+import { createBoardRecord, readBoardState, writeBoardState } from "../../../backend/board-repository";
 
 export async function GET() {
   return Response.json(await readBoardState());

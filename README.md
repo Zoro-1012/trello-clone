@@ -1,6 +1,6 @@
 # TaskOrbit Board
 
-TaskOrbit Board is a Trello-inspired Kanban planning app built with Next.js. It now covers the full core feature set plus the requested bonus items, including comments, attachments, multiple boards, responsive layouts, card covers, and board background customization with a Trello-like purple default theme.
+TaskOrbit Board is a Trello-inspired Kanban planning app built with Next.js. It covers the full core feature set plus the requested bonus items, including comments, attachments, multiple boards, editable team members, responsive layouts, card covers, and board background customization with Trello-style presets.
 
 ## Stack
 
@@ -18,9 +18,10 @@ TaskOrbit Board is a Trello-inspired Kanban planning app built with Next.js. It 
 - Edit card title and description
 - Archive or delete cards
 - Add labels, due dates, checklist items, members, comments, attachments, and cover images
+- Add, edit, recolor, and remove workspace members
 - Search cards by title
 - Filter cards by label, member, due date, and archived state
-- Change board backgrounds from preset themes, including a Trello-style purple gradient
+- Change board backgrounds from preset themes, including a Trello Classic blue option and custom color picker
 - Responsive layout for desktop, tablet, and mobile
 
 ## Database Notes

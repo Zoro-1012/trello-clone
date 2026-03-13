@@ -13,8 +13,44 @@ model Member {
   initials  String
   color     String
   cards     CardMember[]
+  teams     TeamMember[]
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
+}
+
+model Profile {
+  id        String   @id @default(cuid())
+  name      String
+  initials  String
+  color     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AppConfig {
+  id           String   @id
+  activeBoardId String?
+  activeTeamId String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Team {
+  id        String       @id @default(cuid())
+  name      String
+  members   TeamMember[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model TeamMember {
+  teamId     String
+  memberId   String
+  team       Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  member     Member  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@id([teamId, memberId])
 }
 
 model Board {

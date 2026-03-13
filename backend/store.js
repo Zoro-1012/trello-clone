@@ -1,5 +1,5 @@
-import { cloneState, initialState } from "./board-state";
-import { boardThemes } from "./board-themes";
+import { cloneState, initialState } from "../shared/board-state.js";
+import { boardThemes } from "../shared/board-themes.js";
 
 let store = cloneState(initialState);
 

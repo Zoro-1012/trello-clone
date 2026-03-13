@@ -1,11 +1,36 @@
-import { prisma, hasDatabaseUrl } from "./prisma";
-import { cloneState, defaultLabels, defaultMembers, initialState } from "./board-state";
-import { getState, saveState } from "./store";
+import { prisma, hasDatabaseUrl } from "./prisma.js";
+import {
+  cloneState,
+  defaultLabels,
+  defaultMembers,
+  defaultProfile,
+  defaultTeams,
+  initialState
+} from "../shared/board-state.js";
+import { getState, saveState } from "./store.js";
 
 function normalizeState(state) {
+  const profile = state.profile || defaultProfile;
+  const members = state.members || [];
+  const teams =
+    state.teams ||
+    [
+      {
+        id: "team-1",
+        name: "Team",
+        memberIds: members.map((member) => member.id)
+      }
+    ];
+
   return {
     activeBoardId: state.activeBoardId || state.boards[0]?.id || "",
-    members: state.members || [],
+    activeTeamId: state.activeTeamId || teams[0]?.id || "",
+    profile,
+    members,
+    teams: teams.map((team) => ({
+      ...team,
+      memberIds: team.memberIds || []
+    })),
     labels: state.labels || [],
     boards: (state.boards || []).map((board) => ({
       ...board,
@@ -28,7 +53,7 @@ function normalizeState(state) {
   };
 }
 
-function serializeDbState(data) {
+function serializeDbState(data, config) {
   const boards = data.boards
     .sort((a, b) => a.createdAt - b.createdAt)
     .map((board) => ({
@@ -84,12 +109,28 @@ function serializeDbState(data) {
     }));
 
   return normalizeState({
-    activeBoardId: boards[0]?.id || "",
+    activeBoardId: config?.activeBoardId || boards[0]?.id || "",
+    activeTeamId: config?.activeTeamId || data.teams[0]?.id || "",
+    profile: data.profile
+      ? {
+          id: data.profile.id,
+          name: data.profile.name,
+          initials: data.profile.initials,
+          color: data.profile.color
+        }
+      : defaultProfile,
     members: data.members.map((member) => ({
       id: member.id,
       name: member.name,
       initials: member.initials,
       color: member.color
+    })),
+    teams: data.teams.map((team) => ({
+      id: team.id,
+      name: team.name,
+      memberIds: team.members
+        .sort((a, b) => a.createdAt - b.createdAt)
+        .map((entry) => entry.memberId)
     })),
     labels: data.labels.map((label) => ({
       id: label.id,
@@ -101,9 +142,16 @@ function serializeDbState(data) {
 }
 
 async function loadFromDb() {
-  const [members, labels, boards] = await Promise.all([
+  const [profile, config, members, labels, teams, boards] = await Promise.all([
+    prisma.profile.findFirst(),
+    prisma.appConfig.findUnique({ where: { id: "app-config" } }),
     prisma.member.findMany(),
     prisma.label.findMany(),
+    prisma.team.findMany({
+      include: {
+        members: true
+      }
+    }),
     prisma.board.findMany({
       include: {
         lists: {
@@ -124,7 +172,7 @@ async function loadFromDb() {
     })
   ]);
 
-  return serializeDbState({ members, labels, boards });
+  return serializeDbState({ profile, members, labels, teams, boards }, config);
 }
 
 async function seedDbIfEmpty() {
@@ -178,6 +226,8 @@ export async function createBoardRecord(title) {
 
 async function writeToDb(nextState) {
   await prisma.$transaction(async (tx) => {
+    await tx.appConfig.deleteMany();
+    await tx.profile.deleteMany();
     await tx.activityLog.deleteMany();
     await tx.comment.deleteMany();
     await tx.attachment.deleteMany();
@@ -187,8 +237,27 @@ async function writeToDb(nextState) {
     await tx.card.deleteMany();
     await tx.list.deleteMany();
     await tx.board.deleteMany();
+    await tx.teamMember.deleteMany();
+    await tx.team.deleteMany();
     await tx.member.deleteMany();
     await tx.label.deleteMany();
+
+    await tx.profile.create({
+      data: {
+        id: nextState.profile?.id || defaultProfile.id,
+        name: nextState.profile?.name || defaultProfile.name,
+        initials: nextState.profile?.initials || defaultProfile.initials,
+        color: nextState.profile?.color || defaultProfile.color
+      }
+    });
+
+    await tx.appConfig.create({
+      data: {
+        id: "app-config",
+        activeBoardId: nextState.activeBoardId || null,
+        activeTeamId: nextState.activeTeamId || null
+      }
+    });
 
     await tx.member.createMany({
       data: (nextState.members.length ? nextState.members : defaultMembers).map((member) => ({
@@ -198,6 +267,24 @@ async function writeToDb(nextState) {
         color: member.color
       }))
     });
+
+    for (const team of nextState.teams?.length ? nextState.teams : defaultTeams) {
+      await tx.team.create({
+        data: {
+          id: team.id,
+          name: team.name
+        }
+      });
+
+      if (team.memberIds?.length) {
+        await tx.teamMember.createMany({
+          data: team.memberIds.map((memberId) => ({
+            teamId: team.id,
+            memberId
+          }))
+        });
+      }
+    }
 
     await tx.label.createMany({
       data: (nextState.labels.length ? nextState.labels : defaultLabels).map((label) => ({

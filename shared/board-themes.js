@@ -1,5 +1,12 @@
 export const boardThemes = [
   {
+    id: "trello-classic",
+    name: "Trello Classic",
+    preview: "linear-gradient(135deg, #0079bf, #70b500)",
+    background:
+      "linear-gradient(180deg, rgba(0, 121, 191, 0.98) 0%, rgba(0, 121, 191, 0.94) 100%)"
+  },
+  {
     id: "trello-purple",
     name: "Trello Purple",
     preview: "linear-gradient(135deg, #6a4bb4, #d882c4)",
