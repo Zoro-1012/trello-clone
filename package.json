@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "seed": "node prisma/seed.js"
-  },
+"scripts": {
+  "dev": "next dev",
+  "build": "prisma generate && next build",
+  "start": "next start",
+  "lint": "next lint",
+  "seed": "node prisma/seed.js"
+},
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
     "@prisma/client": "^6.5.0",
