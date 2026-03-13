@@ -1,6 +1,7 @@
 "use client";
 
 import clsx from "clsx";
+import { useState } from "react";
 import { format, parseISO } from "date-fns";
 import { CalendarDays, CheckSquare, GripVertical, Paperclip, Plus, Trash2 } from "lucide-react";
 import { getChecklistProgress } from "../helpers";
@@ -24,13 +25,20 @@ export default function ListColumn({
   reorderLists,
   moveCardBetweenLists
 }) {
+  const [listDragEnabled, setListDragEnabled] = useState(false);
   const originalListIndex = board.lists.findIndex((entry) => entry.id === list.id);
 
   return (
     <article
       className={clsx("list-column", dragState?.type === "list" && dragState.id === list.id && "is-dragging")}
-      draggable={!isFiltered}
+      draggable={!isFiltered && listDragEnabled}
       onDragStart={(event) => {
+        if (event.target.closest(".card-tile")) {
+          return;
+        }
+        if (!listDragEnabled) {
+          return;
+        }
         onNativeDragStart({
           type: "list",
           id: list.id,
@@ -41,7 +49,13 @@ export default function ListColumn({
           event.dataTransfer.setData("text/plain", list.id);
         }
       }}
-      onDragEnd={onNativeDragEnd}
+      onDragEnd={(event) => {
+        if (event.target.closest(".card-tile")) {
+          return;
+        }
+        setListDragEnabled(false);
+        onNativeDragEnd();
+      }}
       onDragOver={(event) => {
         if (dragState?.type === "list") {
           event.preventDefault();
@@ -61,7 +75,19 @@ export default function ListColumn({
           onChange={(event) => onListTitleChange(list.id, event.target.value)}
           onMouseDown={(event) => event.stopPropagation()}
         />
-        <button type="button" className="icon-button drag-handle-button" aria-label={`Drag ${list.title}`}>
+        <button
+          type="button"
+          className="icon-button drag-handle-button"
+          aria-label={`Drag ${list.title}`}
+          onMouseDown={() => setListDragEnabled(true)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              setListDragEnabled(true);
+            }
+          }}
+          onMouseUp={() => setListDragEnabled(false)}
+          onBlur={() => setListDragEnabled(false)}
+        >
           <GripVertical size={14} />
         </button>
         <button className="icon-button" onClick={() => onListDelete(list.id)}>
@@ -74,10 +100,12 @@ export default function ListColumn({
         onDragOver={(event) => {
           if (dragState?.type === "card") {
             event.preventDefault();
+            event.stopPropagation();
           }
         }}
         onDrop={(event) => {
           event.preventDefault();
+          event.stopPropagation();
           if (dragState?.type === "card") {
             moveCardBetweenLists(
               dragState.sourceListId,
@@ -105,10 +133,12 @@ export default function ListColumn({
               onDragOver={(event) => {
                 if (dragState?.type === "card") {
                   event.preventDefault();
+                  event.stopPropagation();
                 }
               }}
               onDrop={(event) => {
                 event.preventDefault();
+                event.stopPropagation();
                 if (dragState?.type === "card") {
                   const rect = event.currentTarget.getBoundingClientRect();
                   const dropAfter = event.clientY > rect.top + rect.height / 2;
@@ -125,15 +155,23 @@ export default function ListColumn({
               <div
                 className="card-tile"
                 draggable={!isFiltered}
-                onDragStart={() =>
+                onDragStart={(event) => {
+                  event.stopPropagation();
                   onNativeDragStart({
                     type: "card",
                     id: card.id,
                     sourceListId: list.id,
                     sourceIndex: originalCardIndex ?? cardIndex
-                  })
-                }
-                onDragEnd={onNativeDragEnd}
+                  });
+                  if (event.dataTransfer) {
+                    event.dataTransfer.effectAllowed = "move";
+                    event.dataTransfer.setData("text/plain", card.id);
+                  }
+                }}
+                onDragEnd={(event) => {
+                  event.stopPropagation();
+                  onNativeDragEnd();
+                }}
                 onClick={() => {
                   if (Date.now() < suppressCardOpenUntilRef.current) {
                     return;

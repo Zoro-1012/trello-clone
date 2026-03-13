@@ -225,22 +225,22 @@ export async function createBoardRecord(title) {
 }
 
 async function writeToDb(nextState) {
-  await prisma.$transaction(async (tx) => {
-    await tx.appConfig.deleteMany();
-    await tx.profile.deleteMany();
-    await tx.activityLog.deleteMany();
-    await tx.comment.deleteMany();
-    await tx.attachment.deleteMany();
-    await tx.checklistItem.deleteMany();
-    await tx.cardMember.deleteMany();
-    await tx.cardLabel.deleteMany();
-    await tx.card.deleteMany();
-    await tx.list.deleteMany();
-    await tx.board.deleteMany();
-    await tx.teamMember.deleteMany();
-    await tx.team.deleteMany();
-    await tx.member.deleteMany();
-    await tx.label.deleteMany();
+
+    await prisma.appConfig.deleteMany();
+    await prisma.profile.deleteMany();
+    await prisma.activityLog.deleteMany();
+    await prisma.comment.deleteMany();
+    await prisma.attachment.deleteMany();
+    await prisma.checklistItem.deleteMany();
+    await prisma.cardMember.deleteMany();
+    await prisma.cardLabel.deleteMany();
+    await prisma.card.deleteMany();
+    await prisma.list.deleteMany();
+    await prisma.board.deleteMany();
+    await prisma.teamMember.deleteMany();
+    await prisma.team.deleteMany();
+    await prisma.member.deleteMany();
+    await prisma.label.deleteMany();
 
     await tx.profile.create({
       data: {
@@ -396,5 +396,4 @@ async function writeToDb(nextState) {
         }
       }
     }
-  });
-}
+  };
