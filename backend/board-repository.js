@@ -224,176 +224,266 @@ export async function createBoardRecord(title) {
   return writeBoardState(draft);
 }
 
+// async function writeToDb(nextState) {
+
+//     await prisma.appConfig.deleteMany();
+//     await prisma.profile.deleteMany();
+//     await prisma.activityLog.deleteMany();
+//     await prisma.comment.deleteMany();
+//     await prisma.attachment.deleteMany();
+//     await prisma.checklistItem.deleteMany();
+//     await prisma.cardMember.deleteMany();
+//     await prisma.cardLabel.deleteMany();
+//     await prisma.card.deleteMany();
+//     await prisma.list.deleteMany();
+//     await prisma.board.deleteMany();
+//     await prisma.teamMember.deleteMany();
+//     await prisma.team.deleteMany();
+//     await prisma.member.deleteMany();
+//     await prisma.label.deleteMany();
+
+//     await tx.profile.create({
+//       data: {
+//         id: nextState.profile?.id || defaultProfile.id,
+//         name: nextState.profile?.name || defaultProfile.name,
+//         initials: nextState.profile?.initials || defaultProfile.initials,
+//         color: nextState.profile?.color || defaultProfile.color
+//       }
+//     });
+
+//     await tx.appConfig.create({
+//       data: {
+//         id: "app-config",
+//         activeBoardId: nextState.activeBoardId || null,
+//         activeTeamId: nextState.activeTeamId || null
+//       }
+//     });
+
+//     await tx.member.createMany({
+//       data: (nextState.members.length ? nextState.members : defaultMembers).map((member) => ({
+//         id: member.id,
+//         name: member.name,
+//         initials: member.initials,
+//         color: member.color
+//       }))
+//     });
+
+//     for (const team of nextState.teams?.length ? nextState.teams : defaultTeams) {
+//       await tx.team.create({
+//         data: {
+//           id: team.id,
+//           name: team.name
+//         }
+//       });
+
+//       if (team.memberIds?.length) {
+//         await tx.teamMember.createMany({
+//           data: team.memberIds.map((memberId) => ({
+//             teamId: team.id,
+//             memberId
+//           }))
+//         });
+//       }
+//     }
+
+//     await tx.label.createMany({
+//       data: (nextState.labels.length ? nextState.labels : defaultLabels).map((label) => ({
+//         id: label.id,
+//         name: label.name,
+//         color: label.color
+//       }))
+//     });
+
+//     for (const board of nextState.boards) {
+//       await tx.board.create({
+//         data: {
+//           id: board.id,
+//           title: board.title,
+//           background: board.background
+//         }
+//       });
+
+//       for (const [listIndex, list] of board.lists.entries()) {
+//         await tx.list.create({
+//           data: {
+//             id: list.id,
+//             title: list.title,
+//             position: listIndex,
+//             boardId: board.id
+//           }
+//         });
+
+//         for (const [cardIndex, card] of list.cards.entries()) {
+//           await tx.card.create({
+//             data: {
+//               id: card.id,
+//               title: card.title,
+//               description: card.description || "",
+//               position: cardIndex,
+//               archived: Boolean(card.archived),
+//               dueDate: card.dueDate ? new Date(card.dueDate) : null,
+//               cover: card.cover || null,
+//               listId: list.id
+//             }
+//           });
+
+//           if (card.labelIds?.length) {
+//             await tx.cardLabel.createMany({
+//               data: card.labelIds.map((labelId) => ({
+//                 cardId: card.id,
+//                 labelId
+//               }))
+//             });
+//           }
+
+//           if (card.memberIds?.length) {
+//             await tx.cardMember.createMany({
+//               data: card.memberIds.map((memberId) => ({
+//                 cardId: card.id,
+//                 memberId
+//               }))
+//             });
+//           }
+
+//           if (card.checklist?.length) {
+//             await tx.checklistItem.createMany({
+//               data: card.checklist.map((item, index) => ({
+//                 id: item.id,
+//                 text: item.text,
+//                 completed: Boolean(item.completed),
+//                 position: index,
+//                 cardId: card.id
+//               }))
+//             });
+//           }
+
+//           if (card.comments?.length) {
+//             await tx.comment.createMany({
+//               data: card.comments.map((comment) => ({
+//                 id: comment.id,
+//                 text: comment.text,
+//                 author: comment.author || "Sneh",
+//                 cardId: card.id,
+//                 createdAt: comment.createdAt ? new Date(comment.createdAt) : new Date()
+//               }))
+//             });
+//           }
+
+//           if (card.attachments?.length) {
+//             await tx.attachment.createMany({
+//               data: card.attachments.map((attachment) => ({
+//                 id: attachment.id,
+//                 name: attachment.name,
+//                 url: attachment.url,
+//                 mimeType: attachment.mimeType || null,
+//                 size: attachment.size ?? null,
+//                 cardId: card.id,
+//                 createdAt: attachment.createdAt ? new Date(attachment.createdAt) : new Date()
+//               }))
+//             });
+//           }
+
+//           if (card.activity?.length) {
+//             await tx.activityLog.createMany({
+//               data: card.activity.map((action, index) => ({
+//                 id: `${card.id}-activity-${index}-${action.slice(0, 12).replace(/\s+/g, "-").toLowerCase()}`,
+//                 action,
+//                 cardId: card.id,
+//                 createdAt: new Date(Date.now() - index * 1000)
+//               }))
+//             });
+//           }
+//         }
+//       }
+//     }
+
 async function writeToDb(nextState) {
 
-    await prisma.appConfig.deleteMany();
-    await prisma.profile.deleteMany();
-    await prisma.activityLog.deleteMany();
-    await prisma.comment.deleteMany();
-    await prisma.attachment.deleteMany();
-    await prisma.checklistItem.deleteMany();
-    await prisma.cardMember.deleteMany();
-    await prisma.cardLabel.deleteMany();
-    await prisma.card.deleteMany();
-    await prisma.list.deleteMany();
-    await prisma.board.deleteMany();
-    await prisma.teamMember.deleteMany();
-    await prisma.team.deleteMany();
-    await prisma.member.deleteMany();
-    await prisma.label.deleteMany();
+  // PROFILE
+  await prisma.profile.upsert({
+    where: { id: nextState.profile?.id || "profile-1" },
+    update: {
+      name: nextState.profile?.name,
+      initials: nextState.profile?.initials,
+      color: nextState.profile?.color
+    },
+    create: {
+      id: nextState.profile?.id || "profile-1",
+      name: nextState.profile?.name || "User",
+      initials: nextState.profile?.initials || "U",
+      color: nextState.profile?.color || "#000"
+    }
+  });
 
-    await tx.profile.create({
-      data: {
-        id: nextState.profile?.id || defaultProfile.id,
-        name: nextState.profile?.name || defaultProfile.name,
-        initials: nextState.profile?.initials || defaultProfile.initials,
-        color: nextState.profile?.color || defaultProfile.color
+  // APP CONFIG
+  await prisma.appConfig.upsert({
+    where: { id: "app-config" },
+    update: {
+      activeBoardId: nextState.activeBoardId,
+      activeTeamId: nextState.activeTeamId
+    },
+    create: {
+      id: "app-config",
+      activeBoardId: nextState.activeBoardId,
+      activeTeamId: nextState.activeTeamId
+    }
+  });
+
+  // BOARDS
+  for (const board of nextState.boards) {
+    await prisma.board.upsert({
+      where: { id: board.id },
+      update: {
+        title: board.title,
+        background: board.background
+      },
+      create: {
+        id: board.id,
+        title: board.title,
+        background: board.background
       }
     });
 
-    await tx.appConfig.create({
-      data: {
-        id: "app-config",
-        activeBoardId: nextState.activeBoardId || null,
-        activeTeamId: nextState.activeTeamId || null
-      }
-    });
-
-    await tx.member.createMany({
-      data: (nextState.members.length ? nextState.members : defaultMembers).map((member) => ({
-        id: member.id,
-        name: member.name,
-        initials: member.initials,
-        color: member.color
-      }))
-    });
-
-    for (const team of nextState.teams?.length ? nextState.teams : defaultTeams) {
-      await tx.team.create({
-        data: {
-          id: team.id,
-          name: team.name
+    for (const [listIndex, list] of board.lists.entries()) {
+      await prisma.list.upsert({
+        where: { id: list.id },
+        update: {
+          title: list.title,
+          position: listIndex,
+          boardId: board.id
+        },
+        create: {
+          id: list.id,
+          title: list.title,
+          position: listIndex,
+          boardId: board.id
         }
       });
 
-      if (team.memberIds?.length) {
-        await tx.teamMember.createMany({
-          data: team.memberIds.map((memberId) => ({
-            teamId: team.id,
-            memberId
-          }))
+      for (const [cardIndex, card] of list.cards.entries()) {
+        await prisma.card.upsert({
+          where: { id: card.id },
+          update: {
+            title: card.title,
+            description: card.description || "",
+            position: cardIndex,
+            archived: Boolean(card.archived),
+            dueDate: card.dueDate ? new Date(card.dueDate) : null,
+            cover: card.cover || null,
+            listId: list.id
+          },
+          create: {
+            id: card.id,
+            title: card.title,
+            description: card.description || "",
+            position: cardIndex,
+            archived: Boolean(card.archived),
+            dueDate: card.dueDate ? new Date(card.dueDate) : null,
+            cover: card.cover || null,
+            listId: list.id
+          }
         });
       }
     }
-
-    await tx.label.createMany({
-      data: (nextState.labels.length ? nextState.labels : defaultLabels).map((label) => ({
-        id: label.id,
-        name: label.name,
-        color: label.color
-      }))
-    });
-
-    for (const board of nextState.boards) {
-      await tx.board.create({
-        data: {
-          id: board.id,
-          title: board.title,
-          background: board.background
-        }
-      });
-
-      for (const [listIndex, list] of board.lists.entries()) {
-        await tx.list.create({
-          data: {
-            id: list.id,
-            title: list.title,
-            position: listIndex,
-            boardId: board.id
-          }
-        });
-
-        for (const [cardIndex, card] of list.cards.entries()) {
-          await tx.card.create({
-            data: {
-              id: card.id,
-              title: card.title,
-              description: card.description || "",
-              position: cardIndex,
-              archived: Boolean(card.archived),
-              dueDate: card.dueDate ? new Date(card.dueDate) : null,
-              cover: card.cover || null,
-              listId: list.id
-            }
-          });
-
-          if (card.labelIds?.length) {
-            await tx.cardLabel.createMany({
-              data: card.labelIds.map((labelId) => ({
-                cardId: card.id,
-                labelId
-              }))
-            });
-          }
-
-          if (card.memberIds?.length) {
-            await tx.cardMember.createMany({
-              data: card.memberIds.map((memberId) => ({
-                cardId: card.id,
-                memberId
-              }))
-            });
-          }
-
-          if (card.checklist?.length) {
-            await tx.checklistItem.createMany({
-              data: card.checklist.map((item, index) => ({
-                id: item.id,
-                text: item.text,
-                completed: Boolean(item.completed),
-                position: index,
-                cardId: card.id
-              }))
-            });
-          }
-
-          if (card.comments?.length) {
-            await tx.comment.createMany({
-              data: card.comments.map((comment) => ({
-                id: comment.id,
-                text: comment.text,
-                author: comment.author || "Sneh",
-                cardId: card.id,
-                createdAt: comment.createdAt ? new Date(comment.createdAt) : new Date()
-              }))
-            });
-          }
-
-          if (card.attachments?.length) {
-            await tx.attachment.createMany({
-              data: card.attachments.map((attachment) => ({
-                id: attachment.id,
-                name: attachment.name,
-                url: attachment.url,
-                mimeType: attachment.mimeType || null,
-                size: attachment.size ?? null,
-                cardId: card.id,
-                createdAt: attachment.createdAt ? new Date(attachment.createdAt) : new Date()
-              }))
-            });
-          }
-
-          if (card.activity?.length) {
-            await tx.activityLog.createMany({
-              data: card.activity.map((action, index) => ({
-                id: `${card.id}-activity-${index}-${action.slice(0, 12).replace(/\s+/g, "-").toLowerCase()}`,
-                action,
-                cardId: card.id,
-                createdAt: new Date(Date.now() - index * 1000)
-              }))
-            });
-          }
-        }
-      }
-    }
-  };
+  }
+}
