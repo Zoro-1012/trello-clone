@@ -283,9 +283,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 If you have any questions or need help:
 
-- 📧 **Email**: your.email@example.com
-- 🐛 **Issues**: [GitHub Issues](https://github.com/yourusername/taskorbit-board/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/yourusername/taskorbit-board/discussions)
+- 📧 **Email**: goyalnipurn203@gmail.com
+- 🐛 **Issues**: [GitHub Issues](https://github.com/Zoro-1012/taskorbit-board/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/Zoro-1012/taskorbit-board/discussions)
 
 ---
 
