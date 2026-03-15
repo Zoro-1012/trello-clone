@@ -27,10 +27,6 @@
   <p><em>Detailed card view with comments, attachments, and checklists</em></p>
 </div>
 
-<div align="center">
-  <img src="./screenshots/mobile-view.png" alt="Mobile Responsive" width="40%" />
-  <p><em>Fully responsive design for mobile devices</em></p>
-</div>
 
 ---
 
