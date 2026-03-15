@@ -15,21 +15,6 @@
 
 ---
 
-## 📸 Screenshots
-
-<div align="center">
-  <img src="https://ibb.co/JjRRgTGV" alt="Board Overview" width="80%" />
-  <p><em>Main board view with multiple lists and cards</em></p>
-</div>
-
-<div align="center">
-  <img src="https://ibb.co/xWSzQyc" alt="Card Detail Modal" width="80%" />
-  <p><em>Detailed card view with comments, attachments, and checklists</em></p>
-</div>
-
-
----
-
 ## ✨ Features
 
 ### 🎨 Core Functionality
