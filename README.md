@@ -18,7 +18,7 @@
 ## 📸 Screenshots
 
 <div align="center">
-  <img src="./screenshots/board-overview.png" alt="Board Overview" width="80%" />
+  <img src="https://github.com/Zoro-1012/trello-clone/issues/1#issue-4078835982" alt="Board Overview" width="80%" />
   <p><em>Main board view with multiple lists and cards</em></p>
 </div>
 
